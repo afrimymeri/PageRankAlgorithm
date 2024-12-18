@@ -1,6 +1,8 @@
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 public class PageRank {
     private static final double DEFAULT_DAMPING_FACTOR = 0.85;
@@ -46,6 +48,58 @@ public class PageRank {
             ranks.putAll(newRanks);
         }
         Map<String,Double> temporarily = new HashMap<>();
-        return temporarily; // will change when the right method is added
+        return sortByValue(ranks); // will change when the right method is added
+    }
+
+    /**
+     * Sorts a map by value in descending order.
+     */
+    private static Map<String, Double> sortByValue(Map<String, Double> map) {
+        List<Map.Entry<String, Double>> entries = new ArrayList<>(map.entrySet());
+        entries.sort((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()));
+
+        Map<String, Double> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> entry : entries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
+    /**
+     * Validates the input graph for basic issues.
+     */
+    private static boolean validateGraph(Map<String, List<String>> graph) {
+        for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
+            if (entry.getValue().contains(entry.getKey())) {
+                System.out.printf("Self-loop detected at node %s.\n", entry.getKey());
+                return false;
+            }
+        }
+        return !graph.isEmpty();
+    }
+
+    /**
+     * Loads a graph from a file.
+     */
+    private static Map<String, List<String>> loadGraphFromFile(Scanner scanner) throws IOException {
+        System.out.println("Enter the file path:");
+        String filePath = scanner.nextLine();
+        Map<String, List<String>> graph = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("->");
+                if (parts.length != 2) continue;
+
+                String node = parts[0].trim();
+                List<String> neighbors = Arrays.asList(parts[1].trim().split(","));
+                graph.put(node, neighbors);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found.");
+        }
+
+        return graph;
     }
 }
