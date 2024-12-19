@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class PageRank {
@@ -101,5 +98,62 @@ public class PageRank {
         }
 
         return graph;
+    }
+
+    /**
+     * Allows the user to input a graph manually via the console.
+     */
+    private static Map<String, List<String>> inputGraphManually(Scanner scanner) {
+        Map<String, List<String>> graph = new HashMap<>();
+        Set<String> allNodes = new HashSet<>();
+
+        System.out.println("Enter the graph connections (format: Node -> Neighbor1,Neighbor2,...). Type 'done' to finish:");
+        while (true) {
+            String line = scanner.nextLine();
+            if (line.equalsIgnoreCase("done")) break;
+
+            String[] parts = line.split("->", 2);
+            if (parts.length != 2) {
+                System.out.println("Invalid format. Try again.");
+                continue;
+            }
+
+            String node = parts[0].trim();
+            List<String> neighbors = parts[1].trim().isEmpty() ? new ArrayList<>()
+                    : Arrays.asList(parts[1].trim().split(","));
+
+            graph.put(node, neighbors);
+            allNodes.add(node);
+            allNodes.addAll(neighbors);
+        }
+
+        for (String node : allNodes) {
+            graph.putIfAbsent(node, new ArrayList<>());
+        }
+
+        return graph;
+    }
+
+    /**
+     * Generates a Graphviz DOT file for visualization.
+     */
+    private static void generateVisualizationFile(Map<String, List<String>> graph, Map<String, Double> ranks) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new File("pagerank_graph.dot"))) {
+            writer.println("digraph PageRank {");
+            writer.println("    rankdir=LR;");
+            writer.println("    node [shape=circle];");
+
+            for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
+                for (String neighbor : entry.getValue()) {
+                    writer.printf("    %s -> %s;\n", entry.getKey(), neighbor);
+                }
+            }
+
+            for (Map.Entry<String, Double> entry : ranks.entrySet()) {
+                writer.printf("    %s [label=\"%s\n%.6f\"];\n", entry.getKey(), entry.getKey(), entry.getValue());
+            }
+
+            writer.println("}");
+        }
     }
 }
