@@ -38,7 +38,7 @@ A simple Java-based PageRank calculator that allows users to compute PageRank sc
 3. **Output**:
    - Displays PageRank scores for all nodes.
    - Optionally generates a DOT file for visualization.
-   - 
+     
 ## Visualization Example
 
 Here’s an example graph visualization generated from the DOT file:
