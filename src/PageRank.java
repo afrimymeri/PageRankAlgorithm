@@ -61,18 +61,31 @@ public static void main(String[] args) throws IOException {
         for (String node : graph.keySet()) {
             ranks.put(node, 1.0 / numNodes);
         }
+
+        Set<String> danglingNodes = new HashSet<>();
+        for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                danglingNodes.add(entry.getKey());
+            }
+        }
+
         for (int i = 0; i < MAX_ITERATIONS; i++) {
+            double danglingContribution = 0.0;
+            for (String danglingNode: danglingNodes) {
+                danglingContribution += ranks.get(danglingNode)/numNodes;
+            }
             for (String node : graph.keySet()) {
                 double rankSum = 0.0;
 
-                for (String neighbour : graph.keySet()) {
-                    if (graph.get(neighbour).contains(node)) {
-                        rankSum += ranks.get(neighbour) / graph.get(neighbour).size();
+                for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
+                    String neighbour = entry.getKey();
+                    if (entry.getValue().contains(node)) {
+                        rankSum += ranks.get(neighbour) / entry.getValue().size();
                     }
                 }
 
                 //Update rank with damping factor
-                newRanks.put(node, (1 - dampingFactor) / numNodes + dampingFactor * rankSum);
+                newRanks.put(node, (1 - dampingFactor) / numNodes + dampingFactor * (rankSum+danglingContribution));
             }
 
             //Check for convergence
@@ -89,7 +102,6 @@ public static void main(String[] args) throws IOException {
 
             ranks.putAll(newRanks);
         }
-        Map<String, Double> temporarily = new HashMap<>();
         return sortByValue(ranks);
     }
 
