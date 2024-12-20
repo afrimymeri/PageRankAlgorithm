@@ -202,7 +202,7 @@ public static void main(String[] args) throws IOException {
 
             for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
                 for (String neighbor : entry.getValue()) {
-                    writer.printf("    %s -> %s;\n", entry.getKey(), neighbor);
+                    writer.printf("    %s -> %s\n", entry.getKey(), neighbor);
                 }
             }
 

@@ -1,0 +1,29 @@
+digraph PageRank {
+    rankdir=LR;
+    node [shape=circle];
+    A -> B
+    B -> F
+    C -> B
+    D -> B
+    E -> B
+    F -> G
+    F -> H
+    G -> A
+    H -> E
+    B [label="B
+0.248393"];
+    F [label="F
+0.229884"];
+    A [label="A
+0.123602"];
+    E [label="E
+0.123602"];
+    G [label="G
+0.118510"];
+    H [label="H
+0.118510"];
+    C [label="C
+0.018750"];
+    D [label="D
+0.018750"];
+}
